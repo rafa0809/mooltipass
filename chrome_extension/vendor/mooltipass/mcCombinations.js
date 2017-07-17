@@ -4,21 +4,7 @@
  */
 var extendedCombinations = {
 	trillian: function (forms) {
-        	var validateCredentials = function () {
-            		var username = mpJQ('#x_loginUsername')[0].value;
-            		var password = mpJQ('#x_loginPassword')[0].value;
-            		if (username.length > 0 && password.length > 0) {
-                		messaging({
-                    			'action': 'update_notify',
-                    			'args': [username, 
-						password, 
-						'https://www.trillian.im/api/user/0.1/index.php/signin'
-						]
-                		});
-            		}
-        	};
-        	mpJQ('#x_loginUsername').on('blur', validateCredentials);
-        	mpJQ('#x_loginPassword').on('blur', validateCredentials);
+		this.waitingForPost = true;
         	for (form in forms) {
             		var currentForm = forms[form];
             		currentForm.combination = {
@@ -28,8 +14,8 @@ var extendedCombinations = {
                     			password: ''
                 		},
                 		savedFields: {
-                    			username: '',
-                    			password: ''
+					username: '',
+                                        password: ''
                 		},
                 		autoSubmit: true,
                 		submitHandler: function (credentials) {
@@ -170,6 +156,14 @@ var extendedCombinations = {
 };
 
 var extendedPost = {
+	'trillian.im': function( details ) {
+                if ( details.requestBody && details.requestBody.formData && 
+			details.requestBody.formData.xusername && details.requestBody.formData.xpassword ) {
+                        details.usernameValue = details.requestBody.formData.xusername[0];
+                        details.passwordValue = details.requestBody.formData.xpassword[0];
+                }
+                return details;
+        },
 	'techmania.ch': function( details ) {
 		if ( details.requestParams && details.requestParams.login ) {
 			details.usernameValue = details.requestParams.login;
@@ -229,6 +223,7 @@ mcCombinations.prototype.init = function( callback ) {
 	if (this.settings.debugLevel > 4) cipDebug.log('%c mcCombinations: %c Init','background-color: #c3c6b4','color: #333333');
 
 	this.callback = callback;
+	this.waitingForPost = true;
 	messaging( { "action": "get_settings" } );
 };
 
@@ -967,7 +962,6 @@ mcCombinations.prototype.retrieveCredentialsCallback = function (credentials) {
 				}
 			}
 
-			//console.log( currentForm.combination );
 			if ( currentForm.combination.extraFunction ) {
 				if (this.settings.debugLevel > 4) cipDebug.log('%c mcCombinations: %c Running ExtraFunction for combination','background-color: #c3c6b4','color: #333333');
 				currentForm.combination.extraFunction( currentForm.combination.fields );
@@ -1113,7 +1107,7 @@ mcCombinations.prototype.postDetected = function( details ) {
 				var usernameValue = details.usernameValue?details.usernameValue:false;
 				var storedPasswordValue = false;
 				var passwordValue = details.passwordValue?details.passwordValue:false;
-
+				
 				// Username parsing
 				if ( currentCombination.savedFields.username ) {
 					if ( typeof currentCombination.savedFields.username == 'string') {
@@ -1164,7 +1158,7 @@ mcCombinations.prototype.postDetected = function( details ) {
 					cipDebug.log('%c mcCombinations: %c postDetected - Stored: ', 'background-color: #c3c6b4','color: #333333', storedUsernameValue, storedPasswordValue);
 					cipDebug.log('%c mcCombinations: %c postDetected - Received: ','background-color: #c3c6b4','color: #333333', usernameValue, passwordValue);
 				}
-
+				
 				// Only update if they differ from our database values (and if new values are filled in)
 				if ( ((storedUsernameValue != usernameValue) || (storedPasswordValue != passwordValue)) && (usernameValue != '' && passwordValue != '') ) {
 					var url = document.location.origin;
