@@ -4,7 +4,6 @@
  */
 var extendedCombinations = {
 	trillian: function (forms) {
-		this.waitingForPost = true;
         	for (form in forms) {
             		var currentForm = forms[form];
             		currentForm.combination = {
@@ -962,6 +961,7 @@ mcCombinations.prototype.retrieveCredentialsCallback = function (credentials) {
 				}
 			}
 
+			//console.log( currentForm.combination );
 			if ( currentForm.combination.extraFunction ) {
 				if (this.settings.debugLevel > 4) cipDebug.log('%c mcCombinations: %c Running ExtraFunction for combination','background-color: #c3c6b4','color: #333333');
 				currentForm.combination.extraFunction( currentForm.combination.fields );
