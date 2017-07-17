@@ -13,8 +13,8 @@ var extendedCombinations = {
                     			password: ''
                 		},
                 		savedFields: {
-					username: '',
-                                        password: ''
+					username: mpJQ('#x_loginUsername')[0].value,
+                                        password: mpJQ('#x_loginPassword')[0].value
                 		},
                 		autoSubmit: true,
                 		submitHandler: function (credentials) {
